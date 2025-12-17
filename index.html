@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>News Ticker Demo - Immediate Visibility</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+  }
+
+  #tickerWrapper {
+    width: 500px;
+    overflow: hidden;
+    border: 1px solid #ccc;
+    white-space: nowrap;
+    padding: 5px 0;
+    margin-top: 20px;
+    position: relative;
+  }
+
+  #ticker {
+    display: inline-block;
+    /* 去掉 padding-left，让文字从容器内开始 */
+    will-change: transform;
+  }
+
+  label {
+    font-weight: bold;
+  }
+
+  input[type=range] {
+    width: 300px;
+    margin-left: 10px;
+  }
+</style>
+</head>
+<body>
+
+<h2>News Ticker Demo - Immediate Visibility</h2>
+
+<div>
+  <label for="speedRange">Ticker Speed (0-10):</label>
+  <input type="range" id="speedRange" min="0" max="10" value="5" step="1">
+  <span id="speedValue">5</span>
+</div>
+
+<div id="tickerWrapper">
+  <span id="ticker">🚀 Breaking News: Now the ticker is immediately visible even at the slowest speed! 🌟</span>
+</div>
+
+<script>
+const ticker = document.getElementById('ticker');
+const wrapper = document.getElementById('tickerWrapper');
+const speedRange = document.getElementById('speedRange');
+const speedValue = document.getElementById('speedValue');
+
+// 初始位置部分可见，让文字一开始就能看到
+let pos = 0; 
+
+// 映射函数：滑块 0-10 → 实际速度 0.2-2 px/frame
+function mapSpeed(sliderValue) {
+  const minPx = 0.2;
+  const maxPx = 2;
+  const minSlider = 0;
+  const maxSlider = 10;
+  return minPx + ((sliderValue - minSlider) / (maxSlider - minSlider)) * (maxPx - minPx);
+}
+
+// 初始速度
+let speed = mapSpeed(parseInt(speedRange.value));
+
+function moveTicker() {
+  pos -= speed;
+  if(pos < -ticker.offsetWidth) pos = wrapper.offsetWidth; // 循环回右侧
+  ticker.style.transform = `translateX(${pos}px)`;
+  requestAnimationFrame(moveTicker);
+}
+
+// 启动动画
+requestAnimationFrame(moveTicker);
+
+// 滑块调速
+speedRange.addEventListener('input', () => {
+  const sliderVal = parseInt(speedRange.value);
+  speed = mapSpeed(sliderVal);
+  speedValue.textContent = sliderVal;
+});
+</script>
+
+</body>
+</html>
